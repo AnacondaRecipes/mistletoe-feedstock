@@ -10,35 +10,55 @@ source:
   sha256: 1630f906e5e4bbe66fdeb4d29d277e2ea515d642bb18a9b49b136361a9818c9d
 
 build:
+  number: 0
   entry_points:
     - mistletoe = mistletoe.__main__:main
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
-  number: 1
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: True  # [py<35]
 
 requirements:
   host:
     - pip
-    - python {{ python_min }}
+    - python 
+    - wheel
     - setuptools
   run:
-    - python >={{ python_min }}
+    - python
+  run_constrained:
+    # 2.11.2 is the last version which supports the old Python 3.5
+    - pygments >=2.11.2,<=2.16
 
 test:
+  source_files:
+    - test
   imports:
     - mistletoe
   commands:
     - pip check
     - mistletoe --help
+    - pytest -v test
   requires:
     - pip
-    - python {{ python_min }}
+    - pytest
+    - parameterized
+    - pygments >=2.11.2,<=2.16
 
 about:
   home: https://github.com/miyuchina/mistletoe
   summary: A fast, extensible Markdown parser in pure Python.
   license: MIT
+  license_family: MIT
   license_file: LICENSE
+  description: |
+    mistletoe is a Markdown parser in pure Python, designed to be fast, spec-compliant and fully customizable.
+
+    Apart from being the fastest CommonMark-compliant Markdown parser implementation in pure Python, mistletoe also supports easy
+    definitions of custom tokens. Parsing Markdown into an abstract syntax tree also allows us to swap out renderers for different
+    output formats, without touching any of the core components.
+
+    Remember to spell mistletoe in lowercase
+  doc_url: https://github.com/miyuchina/mistletoe/blob/v1.4.0/README.md
+  dev_url: https://github.com/miyuchina/mistletoe
 
 extra:
   recipe-maintainers:
